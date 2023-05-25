@@ -1,0 +1,10 @@
+<div class="main" style="overflow-y: scroll" id="quizzes-block">
+  <div th:each="quizz: ${quizzes}"  class="main" style="height: 100px; display: grid; grid-template-columns: 50px 90px 90px 90px 40px" >
+    <div><p th:text="${quizz.id}" style="height: 100px; color: #e0dede; "></p></div>
+    <div><p th:text="${quizz.name}" style="height: 100px; color: #e0dede"></p></div>
+    <div><p th:text="${quizz.category.name}" style="height: 100px;color: #e0dede "></p></div>
+    <div><p th:text="${quizz.complexity}" style="height: 100px; color: #e0dede"></p></div>
+    <div><a th:href="@{'/admin/quizs'}" style="height: 100px; color: #e0dede">-></a></div>
+  </div>
+
+</div>

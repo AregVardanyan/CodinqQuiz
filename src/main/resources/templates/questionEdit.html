@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Jost', sans-serif;
+      background: #000e29;
+
+    }
+
+    .main {
+      width: 350px;
+      height: 500px;
+      background: red;
+      overflow: hidden;
+      background: url("https://doc-08-2c-docs.googleusercontent.com/docs/securesc/68c90smiglihng9534mvqmq1946dmis5/fo0picsp1nhiucmc0l25s29respgpr4j/1631524275000/03522360960922298374/03522360960922298374/1Sx0jhdpEpnNIydS4rnN4kHSJtU1EyWka?e=view&authuser=0&nonce=gcrocepgbb17m&user=03522360960922298374&hash=tfhgbs86ka6divo3llbvp93mg4csvb38") no-repeat center/ cover;
+      border-radius: 10px;
+      box-shadow: 5px 20px 50px #000;
+    }
+
+    label {
+      color: #fff;
+      font-size: 2.3em;
+      justify-content: center;
+      display: flex;
+      margin: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: .5s ease-in-out;
+    }
+
+    .input {
+      width: 60%;
+      height: 20px;
+      background: #e0dede;
+      justify-content: center;
+      display: flex;
+      margin: 20px auto;
+      padding: 10px;
+      border: none;
+      outline: none;
+      border-radius: 5px;
+    }
+
+    .options {
+      width: 60%;
+      height: 20px;
+      background: #e0dede;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 60%;
+      height: 40px;
+      margin: 10px auto;
+      justify-content: center;
+      display: block;
+      color: #fff;
+      background: #573b8a;
+      font-size: 1em;
+      font-weight: bold;
+      margin-top: 20px;
+      outline: none;
+      border: none;
+      border-radius: 5px;
+      transition: .2s ease-in;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #6d44b8;
+    }
+
+
+  </style>
+</head>
+<body>
+<div class="main">
+  <label> Edit question</label>
+  <input th:id="${'question-name-'}" th:value="${question.question}" class="input" placeholder="Quiz name" name="name">
+
+  <button type="submit" th:onclick="|updateQuestion(${question.id}, ${question.quiz.id})|">Update question</button>
+
+</div>
+
+<div class="main">
+  <label>Add answer</label>
+  <textarea th:id="${'answer-'}" class="input" placeholder=" Question answer" name="name"
+            style="height: 100px"></textarea>
+
+  <label>
+    <select th:id="${'is-correct'}">
+      <option  value="false" th:text="'false'"></option>
+      <option value="true" th:text="'true'"></option>
+    </select>
+  </label>
+  <button type="submit" th:onclick="|createAnswer(${question.id})|">Add Answer</button>
+
+
+</div>
+<div class="main" style="overflow-y: scroll" id="answers-block">
+  <div th:each="answerr: ${answers}" class="main"
+       style="height: 100px; display: grid; grid-template-columns: 50px 160px 100px 40px">
+    <div><p th:text="${answerr.id}" style="height: 100px; color: #e0dede; "></p></div>
+    <div><p th:text="${answerr.answer}" style="height: 100px; color: #e0dede"></p></div>
+    <div><p th:text="'correct='+ ${answerr.isCorrect}" style="height: 100px; color: #e0dede"></p></div>
+    <div><a th:href="@{'/admin/answer?answerId=' + ${answerr.id}}" style="height: 100px; color: #e0dede">-></a></div>
+
+  </div>
+
+</div>
+
+
+</body>
+<script>
+  function updateQuestion(questionId, quizId) {
+    fetch('http://localhost:8090/admin/question?questionId='+ questionId, {
+      //mode: 'no-cors',
+      method: 'PUT',
+      body: JSON.stringify({
+        "id": questionId,
+        "question": document.getElementById('question-name-').value,
+        "quizId": quizId,
+
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+
+    })
+  }
+
+
+
+  function createAnswer(questionId) {
+    fetch('http://localhost:8090/admin/answer', {
+      //mode: 'no-cors',
+      method: 'POST',
+      body: JSON.stringify({
+        "answer": document.getElementById('answer-').value,
+        "isCorrect": document.getElementById('is-correct').value,
+        "questionId": questionId
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+
+    }).then(response => {
+              if (response.status==200) {
+                updateAnswersTable(questionId);
+                invalidateAnswersForm()
+
+              }
+            }
+    )
+  }
+
+  function invalidateAnswersForm() {
+    document.getElementById('answer-').value = "";
+  }
+
+  async function updateAnswersTable(questionId) {
+    const response = await fetch('http://localhost:8090/admin/answers-table?questionId='+questionId)
+    const data = await response.text();
+    const questionsBlock = document.getElementById('answers-block');
+    questionsBlock.innerHTML = data;
+  }
+</script>
+</html>

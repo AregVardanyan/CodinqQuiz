@@ -1,0 +1,12 @@
+</div>
+<div class="main" style="overflow-y: scroll" id="answers-block">
+    <div th:each="answerr: ${answers}" class="main"
+         style="height: 100px; display: grid; grid-template-columns: 50px 160px 100px 40px">
+        <div><p th:text="${answerr.id}" style="height: 100px; color: #e0dede; "></p></div>
+        <div><p th:text="${answerr.answer}" style="height: 100px; color: #e0dede"></p></div>
+        <div><p th:text="'correct='+ ${answerr.getIsCorrect}" style="height: 100px; color: #e0dede"></p></div>
+        <div><a th:href="@{'/admin/answer?answerId=' + ${answerr.id}}" style="height: 100px; color: #e0dede">-></a></div>
+
+    </div>
+
+</div>

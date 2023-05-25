@@ -1,0 +1,10 @@
+<div id = "question-block" class="main" th:style="'height: 700px; width: 500px'">
+    <label th:text="'Quiz '+ ${quiz.name}"></label>
+    <label th:text="'Question number '+ ${idx+1}"></label>
+    <label th:text="${question.question}"></label>
+
+    <div th:each="answer: ${question.answers}" class="main" style="height: 100px; width: 500px; cursor: pointer">
+        <div th:onclick="|nextQuestion(${answer.getIsCorrect}, ${quiz.id})|"><p th:text="${answer.answer}" style="height: 50px; color: #e0dede"></p></div>
+
+    </div>
+</div>

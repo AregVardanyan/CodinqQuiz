@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+            display: flex;
+
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Jost', sans-serif;
+            background: #000e29;
+
+        }
+        .main{
+            width: 350px;
+            height: 500px;
+            background: red;
+            overflow: hidden;
+            background: url("https://doc-08-2c-docs.googleusercontent.com/docs/securesc/68c90smiglihng9534mvqmq1946dmis5/fo0picsp1nhiucmc0l25s29respgpr4j/1631524275000/03522360960922298374/03522360960922298374/1Sx0jhdpEpnNIydS4rnN4kHSJtU1EyWka?e=view&authuser=0&nonce=gcrocepgbb17m&user=03522360960922298374&hash=tfhgbs86ka6divo3llbvp93mg4csvb38") no-repeat center/ cover;
+            border-radius: 10px;
+            box-shadow: 5px 20px 50px #000;
+        }
+
+        label{
+            color: #fff;
+            font-size: 2.3em;
+            justify-content: center;
+            display: flex;
+            margin: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .5s ease-in-out;
+        }
+        .input{
+            width: 60%;
+            height: 20px;
+            background: #e0dede;
+            justify-content: center;
+            display: flex;
+            margin: 20px auto;
+            padding: 10px;
+            border: none;
+            outline: none;
+            border-radius: 5px;
+        }
+
+        .options{
+            width: 60%;
+            height: 20px;
+            background: #e0dede;
+            border-radius: 5px;
+        }
+        button{
+            width: 60%;
+            height: 40px;
+            margin: 10px auto;
+            justify-content: center;
+            display: block;
+            color: #fff;
+            background: #573b8a;
+            font-size: 1em;
+            font-weight: bold;
+            margin-top: 20px;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+            transition: .2s ease-in;
+            cursor: pointer;
+        }
+        button:hover{
+            background: #6d44b8;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+<a th:href="${'/logout'}" style="right: 5px; position: absolute;">LogOut</a>
+<div class="main">
+    <label >Add quiz</label>
+    <input th:id = "${'quiz-name-'}" class="input" placeholder="Quiz name" name="name">
+    <label><select th:id = "${'quiz-category-'}" class="options" style="cursor: pointer" >
+        <option id = "cat-def=itm" disabled="disabled" selected="selected" >
+            Choose category
+        </option>
+        <option th:each="category: ${categories}"  th:text="${category.name}"  ></option>
+    </select>
+    </label>
+    <label>
+        <select th:id = "${'quiz-complexity-'}" class="options" style="cursor: pointer">
+            <option id = "cmx-def=itm" disabled="disabled" selected="selected">
+                Choose complexity</option>
+            <option th:each="complexity: ${complexities}" th:value="${complexity.name()}" th:text="${complexity.name()}" ></option>
+        </select>
+    </label>
+
+    <button type="submit" th:onclick="|createQuiz()|">Add quiz</button>
+
+
+
+</div>
+
+
+<div class="main" style="overflow-y: scroll" id="quizzes-block">
+    <div th:each="quizz: ${quizzes}"  class="main" style="height: 100px; display: grid; grid-template-columns: 50px 90px 90px 90px 40px" >
+        <div><p th:text="${quizz.id}" style="height: 100px; color: #e0dede; "></p></div>
+        <div><p th:text="${quizz.name}" style="height: 100px; color: #e0dede"></p></div>
+        <div><p th:text="${quizz.category.name}" style="height: 100px;color: #e0dede "></p></div>
+        <div><p th:text="${quizz.complexity}" style="height: 100px; color: #e0dede"></p></div>
+        <div><a th:href="@{'/admin/quiz?quizId=' + ${quizz.id}}" style="height: 100px; color: #e0dede">-></a></div>
+    </div>
+
+</div>
+
+<div class="main" style="width: 200px">
+    <label >Add category</label>
+    <input th:id = "${'category-name-'}" class="input" placeholder="Category name" name="name">
+    <button type="submit" th:onclick="|createCategory()|">Add category</button>
+</div>
+
+<div class="main" style="overflow-y: scroll; width: 200px" id="category-block">
+    <div th:each="category: ${categories}"  class="main" style="height: 100px ;width: 200px; display: grid; grid-template-columns: 50px 150px" >
+        <div><p th:text="${category.id}" style="height: 100px; color: #e0dede; "></p></div>
+        <div><p th:text="${category.name}" style="height: 100px; color: #e0dede"></p></div>
+    </div>
+</div>
+
+</body>
+<script>
+    function createCategory() {
+        fetch('http://localhost:8090/admin/category', {
+            //mode: 'no-cors',
+            method: 'POST',
+            body: JSON.stringify({
+                "name": document.getElementById('category-name-').value,}),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    }
+
+    function createQuiz() {
+        fetch('http://localhost:8090/admin/quiz', {
+            //mode: 'no-cors',
+            method: 'POST',
+            body: JSON.stringify({
+                "name": document.getElementById('quiz-name-').value,
+                "category": document.getElementById('quiz-category-').value,
+                "complexity": document.getElementById('quiz-complexity-').value}),
+            headers: {
+                "Content-Type": "application/json"
+            }
+
+        }) .then(response => {
+            if (response.status == 200) {
+                updateQuizzesTable();
+                invalidateQuizForm()
+            }
+        })
+
+
+    }
+function invalidateQuizForm(){
+    document.getElementById('quiz-name-').value = "";
+    document.getElementById('quiz-category-').value = document.getElementById('cat-def=itm').value;
+    document.getElementById('quiz-complexity-').value = document.getElementById('cmx-def=itm').value;
+}
+    async function updateQuizzesTable(){
+        const response = await fetch('http://localhost:8090/admin/quiz-table')
+        const data = await response.text();
+        const quizzesBlock = document.getElementById('quizzes-block');
+        quizzesBlock.innerHTML = data;
+    }
+</script>
+</html>
